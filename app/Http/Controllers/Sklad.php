@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Mail\Nomenclature_add_mail;
 use App\Models\Sklad_now;
 use App\Models\Sklad_now_storage;
@@ -11,6 +12,7 @@ use App\Models\Sklad_now_historys_items;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use PDF;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -351,6 +353,32 @@ class Sklad extends Controller{
         header("Content-Disposition: attachment;filename=\"Заявка на выдачу материалов со склада.xlsx\"");
         header("Cache-Control: max-age=0");
         $oWriter->save('php://output');
+    }
+
+    public function pdf(){
+        $this->dr();
+        $last_request = Sklad_now_historys::orderby('id', 'desc')->first();
+        $user = User::where('id', '=', Auth::id())->get();
+        $now = Sklad_now::leftJoin('sklad_nomenclature_storages', 'sklad_nomenclatures.id', '=', 'sklad_nomenclature_storages.product_id')
+                ->where('sklad_nomenclature_storages.user_id', '=', Auth::id())->get();
+        $summa = 0;
+        foreach ($now as $el) {
+            $summa += $el->price*$el->count;
+            $Sklad_nomenclature_historys_items = new Sklad_now_historys_items();
+            $Sklad_nomenclature_historys_items->id_req = $last_request->id;
+            $Sklad_nomenclature_historys_items->key_position = $el->key;
+            $Sklad_nomenclature_historys_items->name_position = $el->name;
+            $Sklad_nomenclature_historys_items->name_provider = $el->obosnovaniye;
+            $Sklad_nomenclature_historys_items->norm_doc = $el->statia;
+            $Sklad_nomenclature_historys_items->price = $el->price;
+            $Sklad_nomenclature_historys_items->quantity_position = $el->count;
+            $Sklad_nomenclature_historys_items->save();
+        }
+        $summa = number_format($summa, 0, '', ' ');
+        $pdf = PDF::loadView('pdf.tmc', compact('user', 'last_request', 'now', 'expls', 'summa'));
+        $pdf->setPaper('A4', 'portrait');
+        //return $last_request;
+        return $pdf->download('ТМЦ.pdf');
     }
 
     public function skladGet(){//Импорт базы из Excel
