@@ -8,7 +8,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('skladExcel') }}" type="button" class="btn btn-primary position-relative ms-3">
+                <a href="{{ route('skladPdf') }}" type="button" class="btn btn-primary position-relative ms-3">
                     Сформировать заявку
                 </a>
             </li>

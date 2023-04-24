@@ -21,7 +21,7 @@
                 @if (Auth::user()->id == 2)
                     <div>
                         <a href="{{ route('skladGet') }}" type="button" class="ms-3">
-                            Обновить базу клад
+                            Обновить базу cклад
                         </a>
                     </div>                    
                 @endif
@@ -33,10 +33,16 @@
                         </a>
                     </div>
                 @endif
-
+<!--
                 <div>
                     <a href="{{ route('nomenclature_requests', Auth::user()->id) }}" class="ms-3">
                         Статус заявок
+                    </a>
+                </div>
+-->
+                <div>
+                    <a href="{{ route('downloadSklad') }}" class="ms-3">
+                        Скачать остатки XLS
                     </a>
                 </div>
                 

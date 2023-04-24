@@ -39,9 +39,9 @@ Route::get('/sklad/category/{id}', [Sklad::class, 'setcategory'])
     ->middleware('auth')
     ->name('setcategory');
 
-Route::get('/sklad/skladExcel', [Sklad::class, 'skladExcel'])
+Route::get('/sklad/skladPdf', [Sklad::class, 'skladPdf'])
     ->middleware('auth')
-    ->name('skladExcel');
+    ->name('skladPdf');
 
 Route::get('/sklad/tmcExcel', [Sklad::class, 'tmcExcel'])
     ->middleware('auth')

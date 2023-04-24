@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ControllerDf;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
@@ -17,3 +18,8 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::get('/downloadSklad', [ControllerDf::class, 'downloadSklad'])
+    ->middleware('auth')
+    ->name('downloadSklad');
+    

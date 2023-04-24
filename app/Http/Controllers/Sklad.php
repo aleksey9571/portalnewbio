@@ -355,27 +355,25 @@ class Sklad extends Controller{
         $oWriter->save('php://output');
     }
 
-    public function pdf(){
-        $this->dr();
+    public function skladPdf(){
+        $Sklad_now_historys = new Sklad_now_historys();
+        $Sklad_now_historys->id_user = Auth::id();
+        $Sklad_now_historys->save();
         $last_request = Sklad_now_historys::orderby('id', 'desc')->first();
         $user = User::where('id', '=', Auth::id())->get();
-        $now = Sklad_now::leftJoin('sklad_nomenclature_storages', 'sklad_nomenclatures.id', '=', 'sklad_nomenclature_storages.product_id')
-                ->where('sklad_nomenclature_storages.user_id', '=', Auth::id())->get();
-        $summa = 0;
+        $now = Sklad_now::leftJoin('sklad_now_storages', 'sklad_nows.id', '=', 'sklad_now_storages.product_id')
+                ->where('sklad_now_storages.user_id', '=', Auth::id())
+                ->get();
+        $i = 0;
         foreach ($now as $el) {
-            $summa += $el->price*$el->count;
-            $Sklad_nomenclature_historys_items = new Sklad_now_historys_items();
-            $Sklad_nomenclature_historys_items->id_req = $last_request->id;
-            $Sklad_nomenclature_historys_items->key_position = $el->key;
-            $Sklad_nomenclature_historys_items->name_position = $el->name;
-            $Sklad_nomenclature_historys_items->name_provider = $el->obosnovaniye;
-            $Sklad_nomenclature_historys_items->norm_doc = $el->statia;
-            $Sklad_nomenclature_historys_items->price = $el->price;
-            $Sklad_nomenclature_historys_items->quantity_position = $el->count;
-            $Sklad_nomenclature_historys_items->save();
+            $Sklad_now_historys_items = new Sklad_now_historys_items();
+            $Sklad_now_historys_items->id_req = $last_request->id;
+            $Sklad_now_historys_items->key_position = $el->key;
+            $Sklad_now_historys_items->name_position = $el->name;
+            $Sklad_now_historys_items->quantity_position = $el->quantity;
+            $Sklad_now_historys_items->save();
         }
-        $summa = number_format($summa, 0, '', ' ');
-        $pdf = PDF::loadView('pdf.tmc', compact('user', 'last_request', 'now', 'expls', 'summa'));
+        $pdf = PDF::loadView('pdf.sclad', compact('user', 'last_request', 'now'));
         $pdf->setPaper('A4', 'portrait');
         //return $last_request;
         return $pdf->download('ТМЦ.pdf');
